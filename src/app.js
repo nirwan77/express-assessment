@@ -4,6 +4,7 @@ import helmet from "helmet";
 import cors from "cors";
 
 import exampleApi from "./api/example.js";
+import { errorHandler, normalHandler } from "./middleware/errorHandle.js";
 
 const app = express();
 
@@ -17,5 +18,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/example", exampleApi);
+app.use(normalHandler);
+app.use(errorHandler);
 
 export default app;

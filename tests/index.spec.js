@@ -20,6 +20,8 @@ test.serial("check /example/help", async (t) => {
     }).json()
   );
 
+  console.log(response.body, response.statusCode);
+
   t.is(response.statusCode, 404);
   t.is(response.body.message, "Route not found");
 });
