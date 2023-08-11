@@ -29,17 +29,36 @@ app.post("/login", (req, res) => {
    *
    * user will return undefined if not found
    */
+  const { username: reqUsername, password: reqPassword } = req.body;
+
+  if (!reqUsername || !reqPassword) {
+    return res.sendStatus(400).json("write username and password");
+  }
+
+  const { password, ...payloadObj } = db.findUser({
+    username: reqUsername,
+    password: reqPassword,
+  });
+
+  if (!payloadObj) {
+    return res.sendStatus(401).json("no user");
+  }
+
+  console.log(payloadObj);
+  const token = jwt.sign(payloadObj, secretKey, { expiresIn: "1d" });
+
+  res.status(200).json({ token: `Bearer ${token}` });
 });
 
 // TODO: Make the following route require authentication
-app.get("/protected", (req, res) => {
+app.get("/protected", isAuthenticated, isAuthorized, (req, res) => {
   res
     .status(200)
     .json({ message: "You are authorized to access this resource" });
 });
 
 // TODO: Make the following route require both authentication and authorization
-app.get("/admin", (req, res) => {
+app.get("/admin", isAuthenticated, isAuthorized, (req, res) => {
   res.status(200).json({
     message: "Hi Admin, you are authorized to access the admin panel.",
   });
